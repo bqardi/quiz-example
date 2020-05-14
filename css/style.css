@@ -58,6 +58,10 @@ a:hover {
     cursor: pointer;
 }
 
+.quiz__group-submit.js-active:hover {
+    background-color: aliceblue;
+}
+
 .quiz__choice.js-correct {
     font-weight: 500;
     color: limegreen;
@@ -98,6 +102,40 @@ a:hover {
 .quiz__result-score i {
     color: initial;
     font-style: normal;
+}
+
+.quiz__total-score-container {
+    margin: 0 0 1rem;
+}
+
+.quiz__total-score-title {
+    font-size: 1.2rem;
+}
+
+.quiz__compare ul {
+    list-style-type: none;
+    margin: 0.5rem 0 0 0.5rem;
+}
+
+.quiz__compare-bad {
+    font-weight: 700;
+    color: crimson;
+}
+
+.quiz__compare-good {
+    font-weight: 700;
+    color: royalblue;
+}
+
+.quiz__compare-fantastic {
+    font-weight: 700;
+    color: limegreen;
+}
+
+.quiz__perfect-score {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: limegreen;
 }
 
 

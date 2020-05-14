@@ -3,11 +3,17 @@ document.addEventListener("DOMContentLoaded", event => {
     const quizQuestions = document.getElementById("quiz-questions");
     const quizSubmit = document.getElementById("quiz-submit");
 
+    //Only used for testpurposes (true = activates "test mode", false = disable "test mode")
+    const testMode = true;
+    //Only used for testpurposes
+
+    //To add questions all you need to do is add a new object to this array, and everything is
+    //created dynamically for you:
     const quizItems = [{
-            question: "It's illegal in Texas to put what on your neighbour’s Cow?",
+            question: "It's illegal in Texas to put what on your neighbour’s cow?",
             choices: { a: "Clothes", b: "Dirt", c: "Grafitti", d: "Nails" },
             answers: ["c"],
-            correct: "Seriously? Texas law?",
+            correct: "Seriously? Texas law!?",
             partiallyCorrect: "",
             wrong: "Sorry! The correct answer is Grafitti (really?).",
             scores: [0, 10],
@@ -96,6 +102,7 @@ document.addEventListener("DOMContentLoaded", event => {
         }
         let scoreIndex = 0;
         let quizItemIndex = 0;
+        //Loop through all answers (input elements) and compare answers with quizItems objects
         for (let i = 0; i < form.length; i++) {
             if (form[i].nodeName == "INPUT") {
                 const index = parseInt(form[i].name);
@@ -113,6 +120,7 @@ document.addEventListener("DOMContentLoaded", event => {
             }
         }
         quizItems[quizItemIndex].score = quizItems[quizItemIndex].scores[scoreIndex];
+        //Loop through quizItems objects to display score, comments and show which answers are correct/wrong
         for (let q = 0; q < quizItems.length; q++) {
             const quizItem = quizItems[q];
             const question = document.getElementById("js-question-" + q);
@@ -122,6 +130,7 @@ document.addEventListener("DOMContentLoaded", event => {
                 const id = `q${q + 1}c${choice + 1}`;
                 const inputChoice = document.getElementById(id);
                 const labelChoice = document.getElementById("label-" + id);
+                inputChoice.disabled = true;
                 if (quizItem.answers.includes(key) && !inputChoice.checked) {
                     labelChoice.classList.add("js-correct");
                 } else if (quizItem.answers.includes(key)) {
@@ -131,17 +140,93 @@ document.addEventListener("DOMContentLoaded", event => {
                 }
             });
             if (quizItem.score == quizItem.scores[quizItem.scores.length - 1]) {
-                question.insertAdjacentHTML("afterend", `<p class="quiz__result-comment">${quizItem.correct}</p>`);
+                question.insertAdjacentHTML("afterend", `<p class="quiz__result-comment js-comment">${quizItem.correct}</p>`);
             } else {
                 if (quizItem.score == 0) {
-                    question.insertAdjacentHTML("afterend", `<p class="quiz__result-comment">${quizItem.wrong}</p>`);
+                    question.insertAdjacentHTML("afterend", `<p class="quiz__result-comment js-comment">${quizItem.wrong}</p>`);
                 } else {
-                    question.insertAdjacentHTML("afterend", `<p class="quiz__result-comment">${quizItem.partiallyCorrect}</p>`);
+                    question.insertAdjacentHTML("afterend", `<p class="quiz__result-comment js-comment">${quizItem.partiallyCorrect}</p>`);
                 }
             }
         }
+        quizSubmit.classList.remove("js-active");
+        //Total score display and score info
+        const totalScore = getTotalScore();
+        const maxScore = getMaxScore();
+        const bottomScoreMargin = Math.round(maxScore * 0.3);
+        const topScoreMargin = Math.round(maxScore * 0.8);
+        let scoreQuality = "good";
+        if (totalScore < bottomScoreMargin) {
+            scoreQuality = "bad";
+        }
+        if (totalScore > topScoreMargin) {
+            scoreQuality = "fantastic";
+        }
+        let maxScoreText = "";
+        if (totalScore == maxScore) {
+            maxScoreText = `<p class="quiz__perfect-score">Perfect score! WOW!!!</p>`;
+        }
+        quizSubmit.insertAdjacentHTML("beforebegin", `
+            <div id="quiz-total-score" class="quiz__total-score-container">
+                <p class="quiz__total-score-title">Total score: <span class="quiz__compare-${scoreQuality}">${totalScore}</span> / ${maxScore}</p>
+                ${maxScoreText}
+                <div class="quiz__compare">
+                    <ul>
+                        <li>Below <strong>${bottomScoreMargin}</strong>: <span class="quiz__compare-bad">Bad</span></li>
+                        <li>Between <strong>${bottomScoreMargin}</strong> and <strong>${topScoreMargin}</strong>: <span class="quiz__compare-good">Good</span></li>
+                        <li>Above <strong>${topScoreMargin}</strong>: <span class="quiz__compare-fantastic">Fantastic</span></li>
+                    </ul>
+                </div>
+            </div>
+        `);
+        location.href = "index.html#quiz-total-score";
     }, false);
 
+    form.addEventListener("reset", function(evt) {
+        //Remove all comments
+        const commentElms = document.querySelectorAll(".js-comment");
+        for (let i = commentElms.length - 1; i >= 0; i--) {
+            const commentElm = commentElms[i];
+            commentElm.parentNode.removeChild(commentElm);
+        }
+        //Remove all score elements
+        const resultScoreElms = document.querySelectorAll(".quiz__result-score");
+        for (let i = resultScoreElms.length - 1; i >= 0; i--) {
+            const resultScoreElm = resultScoreElms[i];
+            resultScoreElm.parentNode.removeChild(resultScoreElm);
+        }
+        //Remove color from labels styled with "correct" color
+        const correctLabels = document.querySelectorAll(".js-correct");
+        for (let i = correctLabels.length - 1; i >= 0; i--) {
+            const correctLabel = correctLabels[i];
+            correctLabel.classList.remove("js-correct");
+        }
+        //Remove color from labels styled with "wrong" color
+        const wrongLabels = document.querySelectorAll(".js-wrong");
+        for (let i = wrongLabels.length - 1; i >= 0; i--) {
+            const wrongLabel = wrongLabels[i];
+            wrongLabel.classList.remove("js-wrong");
+        }
+        //Reenable all input elements
+        const inpAll = document.querySelectorAll("input");
+        for (let i = 0; i < inpAll.length; i++) {
+            const inp = inpAll[i];
+            inp.disabled = false;
+        }
+        //Reset quizItems objects
+        for (let i = 0; i < quizItems.length; i++) {
+            const quizItem = quizItems[i];
+            quizItem.score = 0;
+            quizItem.answered = false;
+        }
+        //Remove total score info box
+        const totalScoreArea = document.getElementById("quiz-total-score");
+        if (totalScoreArea) {
+            totalScoreArea.parentNode.removeChild(totalScoreArea);
+        }
+    });
+
+    //Create all question sections with inputelements and labels
     createQuestions();
 
     function createQuestions() {
@@ -153,6 +238,8 @@ document.addEventListener("DOMContentLoaded", event => {
             }
             let input = "";
             Object.keys(quizItem.choices).forEach((key, choice) => {
+                //Make sure the input elements has unique ID's.
+                //Also adds value to use when looking up answers in quizItems objects
                 const id = `q${q + 1}c${choice + 1}`;
                 input += `
                     <input type="${type}" id="${id}" name="${q}" value="${key}">
@@ -172,30 +259,59 @@ document.addEventListener("DOMContentLoaded", event => {
             for (let i = 0; i < quizItem.inputIDs.length; i++) {
                 const inputID = quizItem.inputIDs[i];
                 const inp = document.getElementById(inputID);
-                inp.addEventListener("click", function() {
-                    let allGood = false;
-                    for (let a = 0; a < quizItem.inputIDs.length; a++) {
-                        const inputGroupID = quizItem.inputIDs[a];
-                        const inpGroup = document.getElementById(inputGroupID);
-                        if (inpGroup.checked) {
-                            allGood = true;
-                        }
+                //EventListener listens to click on any input element
+                //which controls the displaying of the "Check answers" -button
+                inp.addEventListener("click", inpClicked);
+            }
+
+            //Only used for testpurposes (selects and checks the first input element in each group)
+            if (testMode) {
+                document.getElementById(quizItem.inputIDs[0]).checked = true;
+                inpClicked();
+            }
+            //Only used for testpurposes
+
+            function inpClicked() {
+                let allGood = false;
+                for (let a = 0; a < quizItem.inputIDs.length; a++) {
+                    const inputGroupID = quizItem.inputIDs[a];
+                    const inpGroup = document.getElementById(inputGroupID);
+                    if (inpGroup.checked) {
+                        allGood = true;
                     }
-                    quizItem.answered = allGood;
-                    let allAnswered = true;
-                    for (let iQuizItems = 0; iQuizItems < quizItems.length; iQuizItems++) {
-                        const quizItem = quizItems[iQuizItems];
-                        if (!quizItem.answered) {
-                            allAnswered = false;
-                        }
+                }
+                quizItem.answered = allGood;
+                let allAnswered = true;
+                for (let iQuizItems = 0; iQuizItems < quizItems.length; iQuizItems++) {
+                    const quizItem = quizItems[iQuizItems];
+                    if (!quizItem.answered) {
+                        allAnswered = false;
                     }
-                    if (allAnswered) {
-                        quizSubmit.classList.add("js-active")
-                    } else {
-                        quizSubmit.classList.remove("js-active")
-                    }
-                })
+                }
+                if (allAnswered) {
+                    quizSubmit.classList.add("js-active");
+                } else {
+                    quizSubmit.classList.remove("js-active");
+                }
             }
         }
+    }
+
+    function getTotalScore() {
+        let score = 0;
+        for (let i = 0; i < quizItems.length; i++) {
+            const quizItem = quizItems[i];
+            score += quizItem.score;
+        }
+        return score;
+    }
+
+    function getMaxScore() {
+        let score = 0;
+        for (let i = 0; i < quizItems.length; i++) {
+            const quizItem = quizItems[i];
+            score += quizItem.scores[quizItem.scores.length - 1];
+        }
+        return score;
     }
 });
