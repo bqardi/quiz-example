@@ -283,8 +283,12 @@ document.addEventListener("DOMContentLoaded", event => {
                 </div>
             </div>
         `);
-        document.getElementById("quiz-total-score").addEventListener("click", resetQuestions);
-        // location.href = "index.html#quiz-total-score";
+        // document.getElementById("quiz-total-score").addEventListener("click", resetQuestions);
+        const totalScoreArea = document.getElementById("quiz-total-score");
+        totalScoreArea.addEventListener("click", function() {
+                totalScoreArea.parentNode.removeChild(totalScoreArea);
+            })
+            // location.href = "index.html#quiz-total-score";
     }, false);
 
     form.addEventListener("reset", resetQuestions);
