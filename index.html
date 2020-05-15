@@ -50,7 +50,7 @@
                             <input id="setting-comment-wrong" class="settings__quiz-input" type="text" placeholder="You got no answers correct!" title="Comment displayed when Check answers is pressed and none of the answers in a group is correct.">
                         </div>
                         <div class="quiz__buttons">
-                            <button id="settings-quiz-submit" class="quiz__group-submit js-active" type="submit">Insert</button>
+                            <button id="settings-quiz-submit" class="quiz__group-submit quiz__group-submit-highlight js-active" type="submit">Insert</button>
                         </div>
                     </form>
                 </div>
@@ -61,15 +61,18 @@
                         <svg class="settings__add-close-icon" viewBox="0 0 24 24"><path d="M20 6.91L17.09 4L12 9.09L6.91 4L4 6.91L9.09 12L4 17.09L6.91 20L12 14.91L17.09 20L20 17.09L14.91 12L20 6.91Z"></path></svg>
                     </a>
                     <h2>Remove all Questions</h2>
-                    <p>Are you sure you want to delete ALL questions?</p>
+                    <p class="margin-bottom">Are you sure you want to delete ALL questions?</p>
                     <div class="quiz__buttons">
                         <button id="settings-quiz-cancel" class="quiz__group-submit js-active" type="submit">Cancel</button>
-                        <button id="settings-quiz-delete" class="quiz__group-submit js-active" type="submit">Delete</button>
+                        <button id="settings-quiz-delete" class="quiz__group-submit quiz__group-submit-highlight js-active" type="submit">Delete</button>
                     </div>
                 </div>
             </section>
         </header>
         <main>
+            <div class="quiz-image-container">
+                <img class="quiz-image" src="./images/the_impossible.jpg" alt="Quiz image">
+            </div>
             <p class="quiz-info">
                 A funny little quiz where you can test your witz on fun irrelevant knowledge.
             </p>
@@ -84,7 +87,7 @@
                 <div id="quiz-questions" class="quiz__question-container"></div>
                 <div id="quiz-buttons" class="quiz__buttons">
                     <button id="quiz-reset" class="quiz__group-submit js-active" type="reset">Reset answers</button>
-                    <button id="quiz-submit" class="quiz__group-submit" type="submit">Check answers</button>
+                    <button id="quiz-submit" class="quiz__group-submit quiz__group-submit-highlight" type="submit">Check answers</button>
                 </div>
             </form>
             <a id="create-question-link" class="create-question-link" href="#">Create new question</a>

@@ -270,18 +270,21 @@ document.addEventListener("DOMContentLoaded", event => {
         }
         quizButtons.insertAdjacentHTML("beforebegin", `
             <div id="quiz-total-score" class="quiz__total-score-container">
-                <p class="quiz__total-score-title">Total score: <span class="quiz__compare-${scoreQuality}">${totalScore}</span> / ${maxScore}</p>
-                ${maxScoreText}
-                <div class="quiz__compare">
-                    <ul>
-                        <li>Below <strong>${bottomScoreMargin}</strong>: <span class="quiz__compare-bad">Bad</span></li>
-                        <li>Between <strong>${bottomScoreMargin}</strong> and <strong>${topScoreMargin}</strong>: <span class="quiz__compare-good">Good</span></li>
-                        <li>Above <strong>${topScoreMargin}</strong>: <span class="quiz__compare-fantastic">Fantastic</span></li>
-                    </ul>
+                <div class="quiz__total-score-inner">
+                    <p class="quiz__total-score-title">Total score: <span class="quiz__compare-${scoreQuality}">${totalScore}</span> / ${maxScore}</p>
+                    ${maxScoreText}
+                    <div class="quiz__compare">
+                        <ul>
+                            <li>Below <strong>${bottomScoreMargin}</strong>: <span class="quiz__compare-bad">Bad</span></li>
+                            <li>Between <strong>${bottomScoreMargin}</strong> and <strong>${topScoreMargin}</strong>: <span class="quiz__compare-good">Good</span></li>
+                            <li>Above <strong>${topScoreMargin}</strong>: <span class="quiz__compare-fantastic">Fantastic</span></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         `);
-        location.href = "index.html#quiz-total-score";
+        document.getElementById("quiz-total-score").addEventListener("click", resetQuestions);
+        // location.href = "index.html#quiz-total-score";
     }, false);
 
     form.addEventListener("reset", resetQuestions);
@@ -319,6 +322,7 @@ document.addEventListener("DOMContentLoaded", event => {
         for (let i = 0; i < inpAll.length; i++) {
             const inp = inpAll[i];
             inp.disabled = false;
+            inp.checked = false;
         }
         //Reset quizItems objects
         for (let i = 0; i < quizItems.length; i++) {
