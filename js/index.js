@@ -2,14 +2,15 @@ document.addEventListener("DOMContentLoaded", event => {
     const form = document.getElementById("quiz");
     const quizQuestions = document.getElementById("quiz-questions");
     const quizSubmit = document.getElementById("quiz-submit");
+    const quizButtons = document.getElementById("quiz-buttons");
 
     //Only used for testpurposes (true = activates "test mode", false = disable "test mode")
-    const testMode = true;
+    const testMode = false;
     //Only used for testpurposes
 
     //To add questions all you need to do is add a new object to this array, and everything is
     //created dynamically for you:
-    const quizItems = [{
+    let quizItems = [{
             question: "It's illegal in Texas to put what on your neighbour’s cow?",
             choices: { a: "Clothes", b: "Dirt", c: "Grafitti", d: "Nails" },
             answers: ["c"],
@@ -95,11 +96,112 @@ document.addEventListener("DOMContentLoaded", event => {
         },
     ]
 
+    //#region SETTINGS
+    const body = document.querySelector("body");
+    const settings = document.getElementById("settings");
+    const settingsMenu = document.getElementById("settings-menu");
+    const settingsClose = document.getElementById("settings-close");
+    const settingsAdd = document.getElementById("settings-add");
+    const settingsMenuAdd = document.getElementById("settings-menu-add");
+    const settingsQuiz = document.getElementById("settings-quiz");
+
+    const settingsClear = document.getElementById("settings-clear");
+    const settingsMenuClear = document.getElementById("settings-menu-clear");
+    const settingsClearClose = document.getElementById("settings-clear-close");
+    const settingsQuizCancel = document.getElementById("settings-quiz-cancel");
+    const settingsQuizDelete = document.getElementById("settings-quiz-delete");
+    const createQuestionLink = document.getElementById("create-question-link");
+
+    body.addEventListener("click", function(evt) {
+        settingsMenu.classList.remove("js-active");
+    });
+    settings.addEventListener("click", function(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        settingsMenu.classList.toggle("js-active");
+    });
+    settingsMenuAdd.addEventListener("click", function(evt) {
+        evt.preventDefault();
+        settingsAdd.classList.add("js-active");
+    });
+    settingsMenuClear.addEventListener("click", function(evt) {
+        evt.preventDefault();
+        settingsClear.classList.add("js-active");
+    });
+    settingsClose.addEventListener("click", function(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        settingsAdd.classList.remove("js-active");
+    });
+    settingsClearClose.addEventListener("click", function(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        settingsClear.classList.remove("js-active");
+    });
+    settingsQuizCancel.addEventListener("click", function(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        settingsClear.classList.remove("js-active");
+    });
+    settingsQuizDelete.addEventListener("click", function(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        resetQuestions();
+        quizItems = [];
+        quizQuestions.innerHTML = "";
+        quizButtons.classList.add("js-hidden");
+        settingsClear.classList.remove("js-active");
+        createQuestionLink.classList.add("js-active");
+    });
+    createQuestionLink.addEventListener("click", function(evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        settingsAdd.classList.add("js-active");
+    });
+
+    settingsQuiz.addEventListener("submit", function(evt) {
+        evt.preventDefault();
+        const letters = "abcdefghijklmnopqrstuvwxyz";
+        let letterIndex = 0;
+        let obj = new Object();
+        obj.question = document.getElementById("setting-question").value;
+        let choices = document.getElementById("setting-choices").value.split(",");
+        obj.choices = new Object();
+        for (let i = 0; i < choices.length; i++) {
+            const choice = choices[i];
+            obj.choices[letters[letterIndex]] = choice;
+            letterIndex++;
+        }
+        letterIndex = 0;
+        obj.answers = [];
+        let answers = document.getElementById("setting-answers").value.split(",");
+        for (let i = 0; i < answers.length; i++) {
+            const answer = answers[i];
+            obj.answers.push(answer);
+        }
+        obj.scores = [0];
+        let scores = document.getElementById("setting-score").value.split(",");
+        for (let i = 0; i < scores.length; i++) {
+            const score = scores[i];
+            obj.scores.push(parseInt(score));
+        }
+        obj.correct = document.getElementById("setting-comment-correct").value;
+        obj.partiallyCorrect = document.getElementById("setting-comment-partly-correct").value;
+        obj.wrong = document.getElementById("setting-comment-wrong").value;
+        obj.score = 0;
+        obj.inputIDs = [];
+        obj.answered = false;
+        quizItems.push(obj);
+        resetQuestions();
+        createQuestions();
+        settingsAdd.classList.remove("js-active");
+        quizButtons.classList.remove("js-hidden");
+        createQuestionLink.classList.remove("js-active");
+    });
+    //#endregion SETTINGS
+
     form.addEventListener("submit", function(evt) {
         evt.preventDefault();
-        if (!quizSubmit.classList.contains("js-active")) {
-            return;
-        }
         let scoreIndex = 0;
         let quizItemIndex = 0;
         //Loop through all answers (input elements) and compare answers with quizItems objects
@@ -166,7 +268,7 @@ document.addEventListener("DOMContentLoaded", event => {
         if (totalScore == maxScore) {
             maxScoreText = `<p class="quiz__perfect-score">Perfect score! WOW!!!</p>`;
         }
-        quizSubmit.insertAdjacentHTML("beforebegin", `
+        quizButtons.insertAdjacentHTML("beforebegin", `
             <div id="quiz-total-score" class="quiz__total-score-container">
                 <p class="quiz__total-score-title">Total score: <span class="quiz__compare-${scoreQuality}">${totalScore}</span> / ${maxScore}</p>
                 ${maxScoreText}
@@ -182,7 +284,12 @@ document.addEventListener("DOMContentLoaded", event => {
         location.href = "index.html#quiz-total-score";
     }, false);
 
-    form.addEventListener("reset", function(evt) {
+    form.addEventListener("reset", resetQuestions);
+
+    //Create all question sections with input-elements and labels
+    createQuestions();
+
+    function resetQuestions() {
         //Remove all comments
         const commentElms = document.querySelectorAll(".js-comment");
         for (let i = commentElms.length - 1; i >= 0; i--) {
@@ -224,12 +331,13 @@ document.addEventListener("DOMContentLoaded", event => {
         if (totalScoreArea) {
             totalScoreArea.parentNode.removeChild(totalScoreArea);
         }
-    });
-
-    //Create all question sections with inputelements and labels
-    createQuestions();
+        //Disable submit button
+        quizSubmit.classList.remove("js-active");
+        quizSubmit.disabled = true;
+    }
 
     function createQuestions() {
+        quizQuestions.innerHTML = "";
         for (let q = 0; q < quizItems.length; q++) {
             const quizItem = quizItems[q];
             let type = "checkbox";
@@ -254,6 +362,7 @@ document.addEventListener("DOMContentLoaded", event => {
                         ${input}
                     </div>
                 </div>
+                <hr class="quiz__question-separator">
             `;
             quizQuestions.insertAdjacentHTML("beforeend", html);
             for (let i = 0; i < quizItem.inputIDs.length; i++) {
@@ -290,8 +399,10 @@ document.addEventListener("DOMContentLoaded", event => {
                 }
                 if (allAnswered) {
                     quizSubmit.classList.add("js-active");
+                    quizSubmit.disabled = false;
                 } else {
                     quizSubmit.classList.remove("js-active");
+                    quizSubmit.disabled = true;
                 }
             }
         }
