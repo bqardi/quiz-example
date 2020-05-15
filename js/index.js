@@ -200,6 +200,8 @@ document.addEventListener("DOMContentLoaded", event => {
     });
     //#endregion SETTINGS
 
+    form.addEventListener("reset", resetQuestions);
+
     form.addEventListener("submit", function(evt) {
         evt.preventDefault();
         let scoreIndex = 0;
@@ -252,6 +254,7 @@ document.addEventListener("DOMContentLoaded", event => {
             }
         }
         quizSubmit.classList.remove("js-active");
+        quizSubmit.disabled = true;
         //Total score display and score info
         const totalScore = getTotalScore();
         const maxScore = getMaxScore();
@@ -280,6 +283,7 @@ document.addEventListener("DOMContentLoaded", event => {
                             <li>Above <strong>${topScoreMargin}</strong>: <span class="quiz__compare-fantastic">Fantastic</span></li>
                         </ul>
                     </div>
+                    <p class="quiz__dismiss">(Click anywhere to dismiss)</p>
                 </div>
             </div>
         `);
@@ -290,8 +294,6 @@ document.addEventListener("DOMContentLoaded", event => {
             })
             // location.href = "index.html#quiz-total-score";
     }, false);
-
-    form.addEventListener("reset", resetQuestions);
 
     //Create all question sections with input-elements and labels
     createQuestions();
